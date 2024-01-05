@@ -16,6 +16,7 @@ export class PredictedProcess {
   // This hack is only used because there is an issue in last test case mocking, which changes original behaviour of ChildProcess.on function
   // For more details search for # FIXME in PredicatedProcess.spec.ts
   private _onCloseCallbacks: Function[] = [];
+  private _onErrorCallbacks: Function[] = [];
 
   public constructor(
     public readonly id: number,
@@ -28,7 +29,6 @@ export class PredictedProcess {
    * WRITE UP:
    * (Please provide a detailed explanation of your approach, specifically the reasoning behind your design decisions. This can be done _after_ the 1h30m time limit.)
    *
-   * ...
    *
    */
   public async run(signal?: AbortSignal): Promise<void> {
@@ -39,10 +39,14 @@ export class PredictedProcess {
     await new Promise((resolve, reject) => {
       const process = this.makeProcess(this.command, signal);
 
-      process.on('error', (error) => {
+      this._onErrorCallbacks.push((error: Error) => {
         debug(`Process ${this.id} error:`, error);
         this.forget(signal);
         reject(new SpawnProcessFailureException(error));
+      });
+
+      process.on('error', (error) => {
+        this._onErrorCallbacks.map((cb) => cb(error));
       });
 
       this._onCloseCallbacks.push(
@@ -81,7 +85,7 @@ export class PredictedProcess {
    * WRITE UP:
    * (Please provide a detailed explanation of your approach, specifically the reasoning behind your design decisions. This can be done _after_ the 1h30m time limit.)
    *
-   * Memoize function returns copy instance with memoization enabled
+   * Returns copy instance with memoization enabled
    *
    */
   public memoize(): PredictedProcess {
@@ -92,6 +96,11 @@ export class PredictedProcess {
     return newInstance;
   }
 
+  /**
+   *
+   * Creates new process in case of memoization is disabled, or memo by signal not found yet
+   * Returns process from memo in case of it is already memoized
+   */
   private makeProcess(command: string, signal?: AbortSignal): ChildProcess {
     if (this._memoized && signal && this._memory?.has(signal)) {
       debug(`Get memoized process ${this.id}`);
@@ -109,12 +118,18 @@ export class PredictedProcess {
     return process;
   }
 
+  /**
+   * Utility function to memoize process
+   */
   private remember(process: ChildProcess, signal: AbortSignal) {
     this._memory = this._memory || new Map();
 
     this._memory.set(signal, process);
   }
 
+  /**
+   * Utility function to cleanup memo
+   */
   private forget(signal?: AbortSignal | null) {
     if (!signal || !this._memoized) return;
 
