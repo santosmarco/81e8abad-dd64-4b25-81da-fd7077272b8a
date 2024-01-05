@@ -29,6 +29,12 @@ export class PredictedProcess {
    * WRITE UP:
    * (Please provide a detailed explanation of your approach, specifically the reasoning behind your design decisions. This can be done _after_ the 1h30m time limit.)
    *
+   * This function handles process lifecycle
+   *
+   * It simply takes process (memoized or new one), and adds listeners to it
+   * In case of process is memoized in just takes memoized version and adds new bunch of handlers,
+   * process.on(...) will add new handler, without checking is handler for same event already attached to process or not, it should add new handler, which also will be called
+   * but test environment mocks process.on() and I used to use simple hack and store handlers list into array
    *
    */
   public async run(signal?: AbortSignal): Promise<void> {
