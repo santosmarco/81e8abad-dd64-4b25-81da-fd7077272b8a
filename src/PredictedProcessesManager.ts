@@ -35,6 +35,6 @@ export class PredictedProcessesManager {
    *
    */
   public async runAll(signal?: AbortSignal): Promise<void> {
-    // TODO: Implement this.
+    await Promise.all(this.processes.map((process) => process.run(signal)));
   }
 }
