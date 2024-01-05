@@ -171,7 +171,12 @@ describe('PredictedProcess', () => {
     const controller = new AbortController();
 
     let resolveFunction = () => {};
+
     (spawn as jest.Mock).mockImplementation(() => ({
+      // # FIXME
+      // There is mistake in this mock implementation, with this scenario only first callback from .on("e",callback) will be invoked
+      // If I do process.on("close",cb1), process.on("close",cb2), process.on("close",cb3) this will not work, only cb1 will be called
+      // BDW i'll try to solve this without modifying tests since that's a requirement
       on: (event: string, callback: Function) => {
         if (event === 'close') {
           resolveFunction = () => callback(0);

@@ -31,10 +31,10 @@ export class PredictedProcessesManager {
    * WRITE UP:
    * (Please provide a detailed explanation of your approach, specifically the reasoning behind your design decisions. This can be done _after_ the 1h30m time limit.)
    *
-   * ...
+   * PredicatedProcess class holds all the logic, so Manager is just simple wrapper which uses Promise.all
    *
    */
   public async runAll(signal?: AbortSignal): Promise<void> {
-    // TODO: Implement this.
+    await Promise.all(this.processes.map((process) => process.run(signal)));
   }
 }
