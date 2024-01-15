@@ -19,12 +19,20 @@ export class PredictedProcess {
  
   /**
    * Runs the process asynchronously, handling caching, errors, and cleanup.
+   * 
+   * @param {AbortSignal} signal - Optional AbortSignal to handle abortion of the operation.
+   * @returns {Promise<void>} - Resolves when the child process exits successfully or rejects if an error occurs.
+   * 
    * Key design decisions:
-   * - Memoization: Avoids redundant executions for the same process and signal state.
+   * - Memoization: Avoids redundant executions for the same process and signal state, optimizing performance.
    * - Error Handling: Throws errors for aborted signals and process failures, ensuring proper error propagation.
    * - Cleanup: Guarantees child process termination and listener removal, preventing resource leaks.
+   * 
+   * @summary This method efficiently manages the execution of asynchronous processes by
+   * avoiding redundancy through memoization, handling aborted signals and errors,
+   * and ensuring proper cleanup to prevent resource leaks. It optimizes performance
+   * for computationally expensive or resource-intensive operations.
    */
-
   public async run(signal?: AbortSignal): Promise<void> {
     // Handle aborted signals
     if (signal?.aborted) {
