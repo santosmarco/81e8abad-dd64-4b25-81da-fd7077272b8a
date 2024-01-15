@@ -75,8 +75,10 @@ export class PredictedProcess {
     this.memo[key] = this;
 
     try {
+      // Await child process execution, handling errors within promiseToSend.
       await promiseToSend;
     } catch (error: any) {
+      // Remove cached process on error and rethrow for proper error propagation.
       delete this.memo[key];
       throw error;
     }
@@ -87,8 +89,16 @@ export class PredictedProcess {
    * Memoizes the process for the given signal state, returning a cached version if available.
    * This optimization avoids redundant process executions for the same process and signal combination.
    * It's crucial for processes that are computationally expensive or access external resources.
+   * 
+   * @summary 
+   * - The memoization key is based on a combination of the process ID and signal state.
+   * - Using the process ID alone as the key may result in incorrect caching when processes share the
+   *   same ID but have different signal states.
+   * - Similarly, using the AbortSignal alone lacks uniqueness and might lead to incorrect caching for
+   *   distinct processes.
+   * - The combination of ID and signal state ensures both uniqueness and the ability to distinguish
+   *   between processes with different signal states, addressing key concerns for proper memoization.
    */
-
   public memoize(): PredictedProcess {
     const newKey = this.getKey(); 
 
@@ -97,6 +107,7 @@ export class PredictedProcess {
       return this.memo[newKey];
     } 
 
+    // Cache and return itself if not found
     return this.memo[newKey] = this;
   }
 }
