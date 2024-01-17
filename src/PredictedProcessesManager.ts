@@ -25,16 +25,24 @@ export class PredictedProcessesManager {
     return this.processes.find((process) => process.id === id);
   }
 
-  /**
-   * Executes multiple predicted processes.
-   *
-   * WRITE UP:
-   * (Please provide a detailed explanation of your approach, specifically the reasoning behind your design decisions. This can be done _after_ the 1h30m time limit.)
-   *
-   * ...
-   *
-   */
+  /*
+  * Executes all managed PredictedProcess instances concurrently, handling both successful and rejected outcomes.
+  * Propagates errors appropriately for consumption by the calling code.
+  * Key design decisions:
+  *  - Uses Promise.allSettled to capture both resolved and rejected promises.
+  *  - Throws an error if any processes are rejected to signal failure to the calling code.
+  *  - Preserves error propagation through a try/catch block for external errors.
+  */
   public async runAll(signal?: AbortSignal): Promise<void> {
-    // TODO: Implement this.
+    try {
+        const results = await Promise.allSettled(this.processes.map((process) => process.run(signal))); 
+        const hasError = results.some((result) => result.status === 'rejected');
+        if (hasError) {
+          throw new Error();
+        }
+    } catch (error: any) {
+        throw error;
+    }
   }
 }
+
