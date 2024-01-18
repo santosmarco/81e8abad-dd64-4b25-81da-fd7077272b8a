@@ -1,4 +1,5 @@
 import type { ChildProcess } from 'child_process';
+//mert mehmet ezgin
 
 export class PredictedProcess {
   private _childProcess: ChildProcess | null = null;
@@ -6,7 +7,7 @@ export class PredictedProcess {
   public constructor(
     public readonly id: number,
     public readonly command: string,
-  ) {}
+  ) { }
 
   /**
    * Spawns and manages a child process to execute a given command, with handling for an optional AbortSignal.
