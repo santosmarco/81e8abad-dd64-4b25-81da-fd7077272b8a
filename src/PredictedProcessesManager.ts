@@ -25,16 +25,17 @@ export class PredictedProcessesManager {
     return this.processes.find((process) => process.id === id);
   }
 
-  /**
-   * Executes multiple predicted processes.
-   *
-   * WRITE UP:
-   * (Please provide a detailed explanation of your approach, specifically the reasoning behind your design decisions. This can be done _after_ the 1h30m time limit.)
-   *
-   * ...
-   *
-   */
   public async runAll(signal?: AbortSignal): Promise<void> {
-    // TODO: Implement this.
+    try {
+      const promises = await Promise.allSettled(
+        this.processes.map((process) => process.run(signal)),
+      );
+      const hasAnError = promises.some((item) => item.status === 'rejected');
+      if (hasAnError) {
+        throw new Error();
+      }
+    } catch (error) {
+      throw error;
+    }
   }
 }
