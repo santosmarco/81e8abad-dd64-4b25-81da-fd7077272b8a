@@ -31,7 +31,9 @@ export class PredictedProcessesManager {
    * WRITE UP:
    * (Please provide a detailed explanation of your approach, specifically the reasoning behind your design decisions. This can be done _after_ the 1h30m time limit.)
    *
-   * ...
+   should resolve after all processes exit successfully :if process lengts is higher than 0 it passes 
+   should reject if an AbortSignal is triggered during execution : it throws reject if abort signal triggers
+   should reject if at least one process terminates with an error :if has error code it rejects
    *
    */
   public async runAll(signal?: AbortSignal): Promise<void> {

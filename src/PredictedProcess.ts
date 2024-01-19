@@ -21,9 +21,30 @@ export class PredictedProcess {
    *
    * WRITE UP:
    * (Please provide a detailed explanation of your approach, specifically the reasoning behind your design decisions. This can be done _after_ the 1h30m time limit.)
-   *
-   * I'll do the explanations tomorrow. It's 2 am right now in Turkiye. 
-   *
+
+   * cleanUp: It kills the child process, remove all the listeners from child process, equals to null and sets false to hasRunSuccesfully state.
+   * _runningPromise: it is flag that is there any runningpromise
+   * _hasEncounteredError: this is a state of encountered error with type boolean
+   * _hasRunSuccesfully:this is a state of run success with type boolean
+   * _memoizedProcesses:  it is flag that is there any memoizedprocess
+   * _childProcess: It creates a child process
+   * 
+   * should reject if the signal is already aborted: i checked if signal exists.
+   * 
+   * should reject if the process terminates with an error: i checked the signal exists and aborted at the same time.
+   * 
+   * should resolve if the process terminates successfully: if code is "0" success it terminated successfully
+   * 
+   * should cleanup after process completion: it kills child processes, remove listeners after completion
+   * 
+   * should reject subsequent calls with the same aborted signal  : it sends 2 signals, accept the first one but rejects the second one.
+   * 
+   * should handle call without an AbortSignal: it takes a code and if it is "0" resolves.
+   * 
+   * should reject immediately if the signal is already aborted : it checks the signal exists and aborted sets _hasEncounteredError=true and rejects 
+   * 
+   * should not cache results of executions that encounter errors or are aborted: cleans up cache data and doesn't caches the executions
+   * 
    */
   public async run(signal?: AbortSignal): Promise<void> {
     if (this._hasRunSuccesfully) {
