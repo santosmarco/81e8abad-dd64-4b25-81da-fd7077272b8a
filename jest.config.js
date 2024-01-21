@@ -12,4 +12,5 @@ module.exports = {
       },
     ],
   },
+  testMatch: ['**/*.spec.ts'], // Add this line to specify the pattern for test files
 };
